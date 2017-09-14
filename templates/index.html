@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- title -->
+    <title>Dashboard | Arbitrium</title>
+
+    <!-- Bootstrap -->
+    <link href="../static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="../static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="../static/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- iCheck -->
+    <link href="../static/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+    <!-- bootstrap-progressbar -->
+    <link href="../static/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+    <!-- JQVMap -->
+    <link href="../static/vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet"/>
+    <!-- bootstrap-daterangepicker -->
+    <link href="../static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <!-- favicon -->
+    <link rel="icon" type="image/png" href="../static/build/images/logo.png" />
+    <!-- Custom Theme Style -->
+    <link href="../static/build/css/custom.min.css" rel="stylesheet">
+    <link href="../static/build/css/arbitrium.css" rel="stylesheet">
+  </head>
+
+  <body class="nav-md">
+
+    <!-- preloader -->
+    <div id="loader-wrapper">
+        <div id="loader"></div>
+        <div class="loader-section section-left"></div>
+        <div class="loader-section section-right"></div>
+    </div>
+    <!-- /preloader -->
+
+    <div class="container body">
+      <div class="main_container">
+        <div class="col-md-3 left_col">
+          <div class="left_col scroll-view">
+            <div class="navbar nav_title" style="border: 0;">
+              <a href="/?show=intro" class="site_title"><img src="../static/build/images/logo.png" height=40px width=40px> <span>Arbitrium</span></a>
+            </div>
+            <div class="clearfix"></div>
+
+            <br />
+
+            <!-- sidebar menu -->
+            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+              <div class="menu_section">
+                <ul class="nav side-menu">
+                  <li><a><i class="fa fa-bar-chart-o"></i> Companies <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      {% for i in data["companies"] %}
+                        <li><a href="/company/{{ i[0] }}">{{ i[1] }}</a></li>
+                        {% end %}
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-edit"></i> New Company <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a data-toggle="modal" data-target="#calculate_churn_gen">Predict for New Company</a></li>
+                      <li><a data-toggle="modal" data-target="#new_company">Add a New Company</a></li>
+                      <li><a data-toggle="modal" data-target="#delete_company">Delete a existing Company</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <!-- /sidebar menu -->
+
+            <!-- /menu footer buttons -->
+            <div class="sidebar-footer hidden-small">
+              <a data-toggle="tooltip" data-placement="top" title="FullScreen" class="side-nav-footer-icon-33" id="btnFullscreen">
+                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="Settings" class="side-nav-footer-icon-34" >
+                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="Logout" href="/logout" class="side-nav-footer-icon-33">
+                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+              </a>
+            </div>
+            <!-- /menu footer buttons -->
+          </div>
+        </div>
+
+        <!-- top navigation -->
+        <div class="top_nav">
+          <div class="nav_menu">
+            <nav>
+              <div class="nav toggle">
+                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+              </div>
+
+              <ul class="nav navbar-nav navbar-right">
+                <li class="">
+                  <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <img src="../static/build/images/img.png" alt="">Admin
+                    <span class=" fa fa-angle-down"></span>
+                  </a>
+                  <ul class="dropdown-menu dropdown-usermenu pull-right">
+                    <li><a href="#"><i class="fa fa-cog pull-right"></i>Settings</a></li>
+                    <li><a href="/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+          <!-- top tiles -->
+          <div class="row tile_count">
+            <div class="col-md-6 col-sm-6 col-xs-6">
+              <h1>{{ data['name'] }}</h1>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-6 churn-button">
+              <button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#calculate_churn">Calculate Churn</button>
+            </div>
+          </div>
+          <!-- /top tiles -->
+
+          <!-- card_1 -->
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel tile  overflow_hidden">
+                <div class="x_title">
+                  <h2>Performance Index</h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li>
+                      <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li>
+                      <a data-toggle="tooltip" data-placement="left" title="The CPI indicates the cumulative score of the growth of {{ data['name'] }} based on its compounded annual growth rate (CAGR) and the public perception towards {{ data['name'] }}."><i class="fa fa-question"></i></a>
+                    </li>
+                    <li>
+                      <a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+
+                <div class="x_content">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <table class="" style="width:100%">
+                        <tr>
+                          <td class="customer-performance-text">
+                            Customer Performance Index is a metric that evaluates the target company’s functioning as a business entity. It is based on indicators such as stock market price and public perception of the end-customer towards the target company.
+                          </td>
+                          <td>
+                            <canvas width="150" height="80" id="performance_chart" class="" style="width: 160px; height: 100px;"></canvas>
+                            <div class="goal-wrapper">
+                              <span id="performance_val_text" class="gauge-value pull-left">0</span>
+                              <span class="gauge-value pull-left">%</span>
+                              <span id="performance_val_max" class="goal-value pull-right">100%</span>
+                            </div>
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+
+                    <div class="col-md-8 col-xs-12 col-sm-6">
+                      <div class="x_title">
+                        <h2>Compound Annual Growth Rate</h2>
+                        <div class="clearfix"></div>
+                      </div>
+                      <br/><br/>
+                      <div id="cagr_plot_01" class="demo-placeholder"></div>
+                    </div>
+
+                    <div class="col-md-4 col-xs-12 col-sm-6">
+                      <div class="x_title">
+                        <h2>Public Perception</h2>
+                        <div class="clearfix"></div>
+                      </div>
+                      <br/><br/>
+                      <center><div class="GaugeMeter" id="PreviewGaugeMeter_1" data-percent="{{ data['twitter'] }}" data-prepend="<font style='color:White;font-size:35px;margin-left:-15px'>&ndash;</font>" data-size="188" data-theme="Blue" data-back="RGBa(0,0,0,.1)" data-animate_gauge_colors="1" data-animate_text_colors="1" data-width="2" data-label="percentage" data-label_color="#000"></div></center>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /card_1 -->
+
+          <!-- card_2 -->
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="dashboard_graph">
+
+                <div class="row x_title">
+                  <div class="col-md-6">
+                    <h3>Live Stock Data <small>Graph title sub-title</small></h3>
+                  </div>
+                  <div class="col-md-6">
+                    <!-- <div id="reportrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                      <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+                      <span>December 30, 2014 - January 28, 2015</span> <b class="caret"></b>
+                    </div> -->
+                  </div>
+                </div>
+
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                  <div id="chart_plot_01" class="demo-placeholder"></div>
+                </div>
+                <div class="clearfix"></div>
+              </div>
+            </div>
+          </div>
+          <!-- /card_2 -->
+
+          <br />
+
+          <!-- card_3 -->
+          <div class="row">
+            <div class="x_panel">
+              <div class="x_title">
+                <h2>DHL-Ford Motors Performance Relation <small>geo-presentation</small></h2>
+                <ul class="nav navbar-right panel_toolbox">
+                  <li>
+                    <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                  </li>
+                  <li>
+                    <a data-toggle="tooltip" data-placement="left" title="The DHL-{{ data['name'] }} performance score determines the performance of DHL and {{ data['name'] }} based on lost time injury frequency rate, on time shipping, shipping accuracy and on time delivery in the various countries."><i class="fa fa-question"></i></a>
+                  </li>
+                  <li>
+                    <a class="close-link"><i class="fa fa-close"></i></a>
+                  </li>
+                </ul>
+                <div class="clearfix"></div>
+              </div>
+              <div class="x_content">
+                <div class="dashboard-widget-content">
+                  <div class="col-md-4 hidden-small">
+                    <h2 class="line_30">Overall : {{ data['kpi']['avg'] }}%</h2>
+
+                    <table class="countries_list">
+                      <tbody>
+                        <tr>
+                          <td>United States</td>
+                          <td class="fs15 fw700 text-right">{{ data['kpi']['USA'] }}%</td>
+                        </tr>
+                        <tr>
+                          <td>Brazil</td>
+                          <td class="fs15 fw700 text-right">{{ data['kpi']['Brazil'] }}%</td>
+                        </tr>
+                        <tr>
+                          <td>Spain</td>
+                          <td class="fs15 fw700 text-right">{{ data['kpi']['Spain'] }}%</td>
+                        </tr>
+                        <tr>
+                          <td>United Kingdom</td>
+                          <td class="fs15 fw700 text-right">{{ data['kpi']['UK'] }}%</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div id="world-map-gdp" class="col-md-8 col-sm-12 col-xs-12" style="height:230px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- card_3 -->
+
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <footer>
+          <div class="pull-right">
+            Developed By Team gdgvit
+          </div>
+          <div class="clearfix"></div>
+        </footer>
+        <!-- /footer content -->
+      </div>
+    </div>
+
+
+    <!-- modal for particular company -->
+    <div class="modal fade" id="calculate_churn" role="dialog">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Probability To Win Calculator</h4>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-8">
+                <form id="churnpred" onkeypress="">
+                  <div class="row churn-form">
+                    <div class="input-field">
+                      <input id="id" type="hidden" class="validate" name="id" value="{{ data['id'] }}"/>
+                    </div>
+                    <div class="input-field">
+                      <label for="opptp">Opportunity Type</label>
+                      <select class="form-control" id="oppType" name="opptp">
+                        <option value="" disabled selected>Choose your option</option>
+                        <option value="1">New</option>
+                        <option value="2">Renewal</option>
+                      </select>
+                    </div>
+                    <div class="input-field">
+                      <label>Status</label>
+                      <select class="form-control" name="stat">
+                        <option value="" disabled selected>Choose your option</option>
+                        <option value="1">Lost</option>
+                        <option value="2">Opportunity</option>
+                        <option value="3">Potential Opportunity</option>
+                        <option value="4">Gain</option>
+                        <option value="5">Cancelled</option>
+                        <option value="6">Early Lead</option>
+                      </select>
+                    </div>
+                    <div class="input-field">
+                      <label>Milestone</label>
+                      <select class="form-control" name="mlstn">
+                        <option value="" disabled selected>Choose your option</option>
+                        <option value="1">Contract Signed</option>
+                        <option value="1">Customer Commitment - Move to Gain</option>
+                        <option value="0.8">Qualified and Signed off by Sponsor</option>
+                        <option value="0.7">Verbal Customer Commitment Received</option>
+                        <option value="0.6">Proposal (incl. COO &amp; COS) signed off</option>
+                        <option value="0.5">Shortlisted</option>
+                        <option value="0.5">Proposal and Solution Fit Presented</option>
+                        <option value="0.3">Potential opportunity</option>
+                        <option value="0.3">Data Quality Assessment Conducted</option>
+                        <option value="0">Early Lead</option>
+                        <option value="-1">Closed-Lost</option>
+                        <option value="-1">Closed_cancelled</option>
+                      </select>
+                    </div>
+                    <div class="input-field">
+                      <label>Payment Terms</label>
+                      <input placeholder="Ex. 30" id="first_name" name="pmtterm" type="text" class="form-control">
+                    </div>
+                    <div class="input-field">
+                      <label>Contract Terms</label>
+                      <input placeholder="Ex. 2" id="first_name" name="ctterm" type="text" class="form-control">
+                    </div>
+                    <br/><br/>
+                    <div class="input-field">
+                      <center>
+        								<div class="input field">
+        									<input id="churnSubmit" type = "submit" value ="Predict" class="btn btn-primary white-text" style="background-color:#307bbb;" />
+        								</div>
+                      </center>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="col-md-4">
+                <h3 class="center probability-title">Probability To Win</h3>
+                <div class="modal-progress">
+                  <canvas width="300" height="200" id="predict_chart_gauge" class="" style="width: 100%; height: 50%;"></canvas>
+                  <div id="churn_val" class="churn_val">0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /modal for particular company churn prediction-->
+
+    <!-- modal for generic churn prediction -->
+    <div class="modal fade" id="calculate_churn_gen" role="dialog">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Probability To Win Calculator</h4>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-8">
+                <form id="churnpred_gen" onkeypress="">
+                  <div class="row churn-form">
+                    <div class="input-field">
+                      <input id="id" type="hidden" class="validate" name="id" value="{{ data['id'] }}"/>
+                    </div>
+                    <div class="input-field">
+                      <label for="opptp">Opportunity Type</label>
+                      <select class="form-control" id="oppType" name="opptp">
+                        <option value="" disabled selected>Choose your option</option>
+                        <option value="1">New</option>
+                        <option value="2">Renewal</option>
+                      </select>
+                    </div>
+                    <div class="input-field">
+                      <label>Status</label>
+                      <select class="form-control" name="stat">
+                        <option value="" disabled selected>Choose your option</option>
+                        <option value="1">Lost</option>
+                        <option value="2">Opportunity</option>
+                        <option value="3">Potential Opportunity</option>
+                        <option value="4">Gain</option>
+                        <option value="5">Cancelled</option>
+                        <option value="6">Early Lead</option>
+                      </select>
+                    </div>
+                    <div class="input-field">
+                      <label>Milestone</label>
+                      <select class="form-control" name="mlstn">
+                        <option value="" disabled selected>Choose your option</option>
+                        <option value="1">Contract Signed</option>
+                        <option value="1">Customer Commitment - Move to Gain</option>
+                        <option value="0.8">Qualified and Signed off by Sponsor</option>
+                        <option value="0.7">Verbal Customer Commitment Received</option>
+                        <option value="0.6">Proposal (incl. COO &amp; COS) signed off</option>
+                        <option value="0.5">Shortlisted</option>
+                        <option value="0.5">Proposal and Solution Fit Presented</option>
+                        <option value="0.3">Potential opportunity</option>
+                        <option value="0.3">Data Quality Assessment Conducted</option>
+                        <option value="0">Early Lead</option>
+                        <option value="-1">Closed-Lost</option>
+                        <option value="-1">Closed_cancelled</option>
+                      </select>
+                    </div>
+                    <div class="input-field">
+                      <label>Payment Terms</label>
+                      <input placeholder="Ex. 30" id="first_name" name="pmtterm" type="text" class="form-control">
+                    </div>
+                    <div class="input-field">
+                      <label>Contract Terms</label>
+                      <input placeholder="Ex. 2" id="first_name" name="ctterm" type="text" class="form-control">
+                    </div>
+                    <br/><br/>
+                    <div class="input-field">
+                      <center>
+                        <div class="input field">
+                          <input id="churnSubmit_gen" type = "submit" value ="Predict" class="btn btn-primary white-text" style="background-color:#307bbb;" />
+                        </div>
+                      </center>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="col-md-4">
+                <h3 class="center probability-title">Probability To Win</h3>
+                <div class="modal-progress">
+                  <canvas width="300" height="200" id="predict_chart_gauge_gen" class="" style="width: 100%; height: 50%;"></canvas>
+                  <div id="churn_val_gen" class="churn_val_gen">0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /modal for generic churn prediction -->
+
+    <!-- modal for adding new company -->
+    <div class="modal fade" id="new_company" role="dialog">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Add a new Company</h4>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-6">
+                <form enctype="multipart/form-data" action="/newCompany" method="post">
+                  <div class="row churn-form">
+                    <div class="input-field">
+                      <label>Company key</label>
+                      <input id="key" name="com_key" type="text" class="form-control">
+                    </div>
+                    <div class="input-field">
+                      <label>Company Name</label>
+                      <input id="name" name="com_name" type="text" class="form-control">
+                    </div>
+                    <div class="input-field">
+                      <label>Company Stock Symbol</label>
+                      <input id="symbol" name="com_symbol" type="text" class="form-control">
+                    </div>
+                    <div class="input-field">
+                      <label>KPI File</label>
+                      <input id="kpi" name="kpi" type="file" class="form-control">
+                    </div>
+                    <div class="input-field">
+                      <label>Train File</label>
+                      <input id="kpi" name="train" type="file" class="form-control">
+                    </div>
+                    <br/><br/>
+                    <div class="input-field">
+                      <center>
+                        <div class="input field">
+                          <input id="addcompanmy" type = "submit" value ="Add Company" class="btn btn-primary white-text" style="background-color:#307bbb;"/>
+                        </div>
+                      </center>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="col-md-6">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /modal for adding new company -->
+
+    <!-- jQuery -->
+    <script src="../static/vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="../static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="../static/vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="../static/vendors/nprogress/nprogress.js"></script>
+    <!-- Chart.js -->
+    <script src="../static/vendors/Chart.js/dist/Chart.min.js"></script>
+    <!-- gauge.js -->
+    <script src="../static/vendors/gauge.js/dist/gauge.min.js"></script>
+    <!-- bootstrap-progressbar -->
+    <script src="../static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <!-- iCheck -->
+    <script src="../static/vendors/iCheck/icheck.min.js"></script>
+    <!-- Skycons -->
+    <script src="../static/vendors/skycons/skycons.js"></script>
+    <!-- Flot -->
+    <script src="../static/vendors/Flot/jquery.flot.js"></script>
+    <script src="../static/vendors/Flot/jquery.flot.pie.js"></script>
+    <script src="../static/vendors/Flot/jquery.flot.time.js"></script>
+    <script src="../static/vendors/Flot/jquery.flot.stack.js"></script>
+    <script src="../static/vendors/Flot/jquery.flot.resize.js"></script>
+    <!-- Flot plugins -->
+    <script src="../static/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+    <script src="../static/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+    <script src="../static/vendors/flot.curvedlines/curvedLines.js"></script>
+    <!-- DateJS -->
+    <script src="../static/vendors/DateJS/build/date.js"></script>
+    <!-- JQVMap -->
+    <script src="../static/vendors/jqvmap/dist/jquery.vmap.js"></script>
+    <script src="../static/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+    <script src="../static/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
+    <!-- bootstrap-daterangepicker -->
+    <script src="../static/vendors/moment/min/moment.min.js"></script>
+    <script src="../static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+    <script src="../static/build/js/jquery.AshAlom.gaugeMeter-2.0.0.min.js"></script>
+    <!-- Custom Theme Scripts -->
+    <script src="../static/build/js/custom.js"></script>
+    <script src="../static/build/js/arbitrium.js"></script>
+    <!-- for chart loading -->
+    <script>
+    $(document).ready(function() {
+
+      performance_val({{ data['comb'] }});
+      init_flot_chart(
+        JSON.parse('{{ data["stk"] }}'.replace(/&quot;/g,'"'))
+      );
+      $(".GaugeMeter").gaugeMeter();
+      predict_churn(0);
+      predict_churn_gen(0);
+      init_cagr_chart(
+          JSON.parse('{{ data["cagr"] }}')
+        );
+
+      $('#churnSubmit').click(function(e){
+        e.preventDefault()
+
+        console.log($('#oppType option:selected').val());
+
+        $.ajax({
+          method:'post',
+          url:'/getchurn',
+          data: $("#churnpred").serialize()
+        }).done(function(response){
+          console.log(response.percentage)
+          predict_churn(response.percentage);
+        })
+      })
+
+      $('#churnSubmit_gen').click(function(e){
+        e.preventDefault()
+
+        console.log($('#oppType option:selected').val());
+
+        $.ajax({
+          method:'post',
+          url:'/getchurn',
+          data: $("#churnpred_gen").serialize()
+        }).done(function(response){
+          console.log(response.percentage)
+          predict_churn_gen(response.percentage);
+        })
+      })
+    });
+    </script>
+
+  </body>
+</html>
